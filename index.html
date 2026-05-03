@@ -4,12 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="theme-color" content="#000000">
-    <meta name="description" content="TVBox - TikTok Tổng Tài for TV">
     <title>TVBox - TikTok Tổng Tài</title>
     
     <link rel="manifest" href="manifest.json">
     <link rel="icon" type="image/svg+xml" href="assets/icon.svg">
-    <link rel="apple-touch-icon" href="assets/icon.svg">
     
     <style>
         * {
@@ -20,380 +18,192 @@
         
         html, body {
             height: 100%;
+            background: #000;
+            color: #fff;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
             overflow: hidden;
-            background: #000;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
         }
         
-        .app-container {
+        .landing {
             height: 100vh;
-            width: 100vw;
-            position: relative;
-            background: #000;
-        }
-        
-        /* Header */
-        .header {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            z-index: 100;
             display: flex;
-            justify-content: center;
+            flex-direction: column;
             align-items: center;
-            padding: 15px 20px;
-            background: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent);
+            justify-content: center;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            padding: 40px;
+            text-align: center;
         }
         
         .logo {
-            font-size: 24px;
+            font-size: 48px;
             font-weight: bold;
-            background: linear-gradient(45deg, #ff6b6b, #ff8e8e);
-            -webkit-background-clip: text;
-            background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        
-        .search-hint {
-            position: absolute;
-            right: 20px;
-            font-size: 14px;
-            opacity: 0.7;
-            color: #fff;
-        }
-        
-        /* Video Container */
-        .video-container {
-            height: 100%;
-            width: 100%;
-            overflow-y: scroll;
-            scroll-snap-type: y mandatory;
-            scroll-behavior: smooth;
-        }
-        
-        .video-container::-webkit-scrollbar {
-            display: none;
-        }
-        
-        /* Video Item */
-        .video-item {
-            height: 100vh;
-            width: 100%;
-            position: relative;
-            scroll-snap-align: start;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: #000;
-        }
-        
-        .video-player {
-            height: 100%;
-            width: 100%;
-            max-width: 100vh;
-            object-fit: contain;
-            background: #000;
-        }
-        
-        /* Video Overlay */
-        .video-overlay {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 100px;
-            padding: 100px 20px 120px;
-            background: linear-gradient(transparent, rgba(0,0,0,0.8));
-            pointer-events: none;
-        }
-        
-        .video-info {
-            color: #fff;
-        }
-        
-        .author-row {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-bottom: 12px;
-        }
-        
-        .author-avatar {
-            width: 44px;
-            height: 44px;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 2px solid #fff;
-        }
-        
-        .author-name {
-            font-size: 16px;
-            font-weight: 600;
-        }
-        
-        .follow-btn {
-            background: #ff6b6b;
-            color: #fff;
-            border: none;
-            padding: 6px 16px;
-            border-radius: 4px;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            pointer-events: auto;
-        }
-        
-        .video-desc {
-            font-size: 15px;
-            line-height: 1.5;
             margin-bottom: 10px;
         }
         
-        .hashtag {
-            color: #ff6b6b;
-            font-weight: 500;
+        .logo span {
+            color: #ff0050;
         }
         
-        .music-row {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 14px;
-            opacity: 0.9;
+        .subtitle {
+            font-size: 20px;
+            opacity: 0.8;
+            margin-bottom: 60px;
         }
         
-        .music-icon {
-            animation: spin 3s linear infinite;
-        }
-        
-        .music-name {
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-        
-        @keyframes spin {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
-        }
-        
-        /* Action Buttons */
-        .action-buttons {
-            position: absolute;
-            right: 10px;
-            bottom: 120px;
+        .options {
             display: flex;
             flex-direction: column;
             gap: 20px;
-            pointer-events: auto;
+            width: 100%;
+            max-width: 400px;
         }
         
-        .action-btn {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 4px;
-            color: #fff;
+        .option-btn {
+            padding: 20px 30px;
+            border-radius: 12px;
+            border: none;
+            font-size: 18px;
+            font-weight: 600;
             cursor: pointer;
-            transition: transform 0.1s;
-        }
-        
-        .action-btn:active {
-            transform: scale(0.9);
-        }
-        
-        .action-icon {
-            width: 48px;
-            height: 48px;
-            background: rgba(255,255,255,0.1);
-            border-radius: 50%;
+            transition: all 0.3s;
+            text-decoration: none;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 24px;
-            backdrop-filter: blur(10px);
+            gap: 10px;
         }
         
-        .action-btn span {
-            font-size: 12px;
-            font-weight: 500;
-        }
-        
-        .record-disc {
-            animation: spin 5s linear infinite;
-        }
-        
-        /* Loading Indicator */
-        .loading-indicator {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            z-index: 200;
-            display: none;
-            flex-direction: column;
-            align-items: center;
-            gap: 15px;
+        .option-btn.primary {
+            background: #ff0050;
             color: #fff;
         }
         
-        .spinner {
-            width: 40px;
-            height: 40px;
-            border: 3px solid rgba(255,255,255,0.2);
-            border-top-color: #ff6b6b;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
+        .option-btn.primary:hover {
+            background: #ff1a66;
+            transform: scale(1.02);
         }
         
-        /* Navigation Hints */
-        .nav-hints {
+        .option-btn.secondary {
+            background: rgba(255,255,255,0.1);
+            color: #fff;
+            border: 2px solid rgba(255,255,255,0.3);
+        }
+        
+        .option-btn.secondary:hover {
+            background: rgba(255,255,255,0.2);
+            border-color: #ff0050;
+        }
+        
+        .hint {
+            margin-top: 40px;
+            font-size: 14px;
+            opacity: 0.6;
+            max-width: 300px;
+            line-height: 1.6;
+        }
+        
+        .nav-hint {
             position: fixed;
-            bottom: 20px;
+            bottom: 30px;
             left: 50%;
             transform: translateX(-50%);
-            background: rgba(0,0,0,0.7);
-            padding: 12px 24px;
-            border-radius: 30px;
             display: flex;
             gap: 20px;
-            align-items: center;
-            z-index: 100;
-            font-size: 13px;
-            color: #fff;
-            opacity: 0.9;
+            font-size: 14px;
+            opacity: 0.8;
         }
         
-        .nav-hints kbd {
+        .nav-hint kbd {
             background: rgba(255,255,255,0.2);
             padding: 4px 10px;
-            border-radius: 5px;
-            font-family: inherit;
+            border-radius: 4px;
         }
         
-        /* Mute Indicator */
-        .mute-indicator {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            font-size: 48px;
-            z-index: 300;
-            opacity: 0;
-            transition: opacity 0.3s;
-            pointer-events: none;
-            background: rgba(0,0,0,0.7);
-            padding: 20px;
-            border-radius: 50%;
-        }
-        
-        .mute-indicator.show {
-            opacity: 1;
-        }
-        
-        /* Progress Bar */
-        .progress-bar {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            height: 3px;
-            background: rgba(255,255,255,0.2);
-            z-index: 50;
-        }
-        
-        .progress-fill {
-            height: 100%;
-            background: #ff6b6b;
-            width: 0%;
-            transition: width 0.1s linear;
-        }
-        
-        /* Play/Pause Overlay */
-        .play-overlay {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            font-size: 80px;
-            color: rgba(255,255,255,0.8);
-            opacity: 0;
-            transition: opacity 0.3s;
-            pointer-events: none;
-            z-index: 60;
-        }
-        
-        .play-overlay.show {
-            opacity: 1;
-        }
-        
-        /* TV Optimizations */
-        @media (min-width: 1024px) {
-            .action-icon {
-                width: 60px;
-                height: 60px;
-                font-size: 28px;
+        @media (min-width: 768px) {
+            .logo {
+                font-size: 64px;
             }
             
-            .author-name {
-                font-size: 20px;
+            .subtitle {
+                font-size: 24px;
             }
             
-            .video-desc {
-                font-size: 18px;
+            .options {
+                flex-direction: row;
+                max-width: 600px;
             }
             
-            .nav-hints {
-                font-size: 16px;
-                padding: 15px 30px;
+            .option-btn {
+                flex: 1;
             }
-            
-            .nav-hints kbd {
-                padding: 6px 14px;
-            }
-        }
-        
-        /* Focus styles for TV navigation */
-        .action-btn:focus {
-            outline: 2px solid #ff6b6b;
-            outline-offset: 4px;
-            border-radius: 50%;
-        }
-        
-        .follow-btn:focus {
-            outline: 2px solid #fff;
-            outline-offset: 2px;
         }
     </style>
 </head>
 <body>
-    <div class="app-container">
-        <header class="header">
-            <div class="logo">TVBox</div>
-            <div class="search-hint">Tổng Tài</div>
-        </header>
+    <div class="landing">
+        <h1 class="logo">TV<span>Box</span></h1>
+        <p class="subtitle">TikTok Tổng Tài for TV</p>
         
-        <div class="video-container" id="videoContainer">
-            <div class="video-feed" id="videoFeed"></div>
+        <div class="options">
+            <a href="https://www.tiktok.com/search?q=t%E1%BB%95ng%20t%C3%A0i" target="_blank" class="option-btn primary">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-5.2 1.74 2.89 2.89 0 012.31-4.64 2.93 2.93 0 01.88.13V9.4a6.84 6.84 0 00-1-.05A6.33 6.33 0 005 20.1a6.34 6.34 0 0010.86-4.43v-7a8.16 8.16 0 004.77 1.52v-3.4a4.85 4.85 0 01-1-.1z"/>
+                </svg>
+                Mở TikTok Tổng Tài
+            </a>
+            
+            <a href="player.html" class="option-btn secondary">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M8 5v14l11-7z"/>
+                </svg>
+                Chơi TVBox (Demo)
+            </a>
         </div>
         
-        <div class="loading-indicator" id="loadingIndicator">
-            <div class="spinner"></div>
-            <span>Đang tải...</span>
-        </div>
-        
-        <div class="mute-indicator" id="muteIndicator">🔊</div>
-        
-        <div class="nav-hints">
-            <span><kbd>↑</kbd> Prev</span>
-            <span><kbd>↓</kbd> Next</span>
-            <span><kbd>Enter</kbd> Play</span>
-            <span><kbd>Esc</kbd> Mute</span>
-        </div>
+        <p class="hint">
+            <strong>Mở TikTok:</strong> Xem video tổng tài thật từ TikTok (yêu cầu đăng nhập)<br><br>
+            <strong>TVBox Demo:</strong> Xem video mẫu với giao diện giống TikTok, phím lên/xuống để chuyển video
+        </p>
     </div>
     
-    <script src="app.js"></script>
+    <div class="nav-hint">
+        <span><kbd>↑</kbd> <kbd>↓</kbd> Chọn</span>
+        <span><kbd>Enter</kbd> OK</span>
+    </div>
+    
     <script>
+        // TV keyboard navigation
+        let focusedIndex = 0;
+        const buttons = document.querySelectorAll('.option-btn');
+        
+        document.addEventListener('keydown', (e) => {
+            switch(e.key) {
+                case 'ArrowUp':
+                case 'ArrowLeft':
+                    e.preventDefault();
+                    focusedIndex = Math.max(0, focusedIndex - 1);
+                    buttons[focusedIndex]?.focus();
+                    break;
+                    
+                case 'ArrowDown':
+                case 'ArrowRight':
+                    e.preventDefault();
+                    focusedIndex = Math.min(buttons.length - 1, focusedIndex + 1);
+                    buttons[focusedIndex]?.focus();
+                    break;
+                    
+                case 'Enter':
+                    e.preventDefault();
+                    buttons[focusedIndex]?.click();
+                    break;
+            }
+        });
+        
+        // Focus first button
+        buttons[0]?.focus();
+        
+        // Register service worker
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('service-worker.js');
         }
