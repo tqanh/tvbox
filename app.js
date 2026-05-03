@@ -1,4 +1,4 @@
-// TVBox - TikTok Style Video Player for TV
+// TVBox - TikTok Research API Integration
 // Full-screen vertical video with up/down navigation
 
 class TVBoxApp {
@@ -6,98 +6,8 @@ class TVBoxApp {
         this.videos = [];
         this.currentVideoIndex = 0;
         this.isLoading = false;
-        
-        // Sample TikTok-style videos (9:16 aspect ratio samples)
-        this.sampleVideos = [
-            {
-                id: '1',
-                author: '@tongtai_luxury',
-                desc: 'Tổng tài trong bộ vest đen 🖤 #tongtai #ceo #fyp',
-                videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
-                avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop',
-                likes: '1.2M',
-                comments: '45.2K',
-                shares: '12.1K',
-                music: 'Nhạc nền - Luxury Vibes'
-            },
-            {
-                id: '2',
-                author: '@ceo_official',
-                desc: 'A day in my life as CEO 💼 #ceo #morningroutine #tongtai',
-                videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4',
-                avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop',
-                likes: '856.4K',
-                comments: '32.1K',
-                shares: '8.5K',
-                music: 'Original sound - CEO Official'
-            },
-            {
-                id: '3',
-                author: '@badboy_style',
-                desc: 'Bad boy vibes 😎 #badboy #tongtai #fashion',
-                videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
-                avatar: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=100&h=100&fit=crop',
-                likes: '2.1M',
-                comments: '89.3K',
-                shares: '25.6K',
-                music: 'Bad Boy - Original Mix'
-            },
-            {
-                id: '4',
-                author: '@gentleman_vn',
-                desc: 'Quý ông lịch lãm 🎩 #gentleman #style #tongtai',
-                videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4',
-                avatar: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=100&h=100&fit=crop',
-                likes: '567.8K',
-                comments: '21.4K',
-                shares: '6.2K',
-                music: 'Classical Vibes - Gentleman'
-            },
-            {
-                id: '5',
-                author: '@richkid_life',
-                desc: 'Luxury lifestyle ✨ #richkid #luxury #tongtai',
-                videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4',
-                avatar: 'https://images.unsplash.com/photo-1552374196-c4e7ffc6e126?w=100&h=100&fit=crop',
-                likes: '3.4M',
-                comments: '125.6K',
-                shares: '45.8K',
-                music: 'Luxury Life - Beats'
-            },
-            {
-                id: '6',
-                author: '@alpha_male',
-                desc: 'Alpha male energy 💪 #alpha #tongtai #motivation',
-                videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4',
-                avatar: 'https://images.unsplash.com/photo-1504257432389-52343af06ae3?w=100&h=100&fit=crop',
-                likes: '1.8M',
-                comments: '67.2K',
-                shares: '18.9K',
-                music: 'Alpha - Motivation Beats'
-            },
-            {
-                id: '7',
-                author: '@suit_master',
-                desc: 'Perfect fit 👔 #suit #fashion #tongtai',
-                videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4',
-                avatar: 'https://images.unsplash.com/photo-1594938298603-c8148c4dae35?w=100&h=100&fit=crop',
-                likes: '923.1K',
-                comments: '38.7K',
-                shares: '11.2K',
-                music: 'Suit Up - Fashion Beats'
-            },
-            {
-                id: '8',
-                author: '@billionaire_goals',
-                desc: 'Billionaire mindset 🏆 #billionaire #goals #tongtai',
-                videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/VolkswagenGTIReview.mp4',
-                avatar: 'https://images.unsplash.com/photo-1556157382-97eda2d62296?w=100&h=100&fit=crop',
-                likes: '4.2M',
-                comments: '156.8K',
-                shares: '62.3K',
-                music: 'Success - Billionaire Beats'
-            }
-        ];
+        this.api = new TikTokAPI();
+        this.searchKeyword = 'tổng tài';
         
         this.init();
     }
@@ -112,30 +22,22 @@ class TVBoxApp {
         this.videoContainer = document.getElementById('videoContainer');
         this.videoFeed = document.getElementById('videoFeed');
         this.loadingIndicator = document.getElementById('loadingIndicator');
+        this.searchInput = document.getElementById('searchInput');
     }
     
     bindEvents() {
         // Keyboard navigation for TV
         document.addEventListener('keydown', (e) => this.handleKeyNavigation(e));
         
-        // Touch/scroll for mobile
-        let touchStartY = 0;
-        document.addEventListener('touchstart', (e) => {
-            touchStartY = e.touches[0].clientY;
-        });
-        
-        document.addEventListener('touchend', (e) => {
-            const touchEndY = e.changedTouches[0].clientY;
-            const diff = touchStartY - touchEndY;
-            
-            if (Math.abs(diff) > 50) {
-                if (diff > 0) {
-                    this.nextVideo();
-                } else {
-                    this.prevVideo();
+        // Search input
+        if (this.searchInput) {
+            this.searchInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    this.searchKeyword = this.searchInput.value || 'tổng tài';
+                    this.loadVideos();
                 }
-            }
-        });
+            });
+        }
     }
     
     handleKeyNavigation(e) {
@@ -161,7 +63,6 @@ class TVBoxApp {
             case 'Escape':
             case 'Backspace':
                 e.preventDefault();
-                // Toggle mute/unmute
                 this.toggleMute();
                 break;
                 
@@ -176,45 +77,108 @@ class TVBoxApp {
     async loadVideos() {
         this.showLoading();
         
-        // Simulate API delay
-        await new Promise(resolve => setTimeout(resolve, 500));
+        try {
+            const result = await this.api.searchVideos(this.searchKeyword);
+            this.videos = result.videos.map(v => ({
+                id: v.id,
+                author: v.username,
+                desc: v.video_description || v.title,
+                thumbnail: v.thumbnail_url || `https://picsum.photos/400/600?random=${v.id}`,
+                likes: this.formatNumber(v.like_count),
+                comments: this.formatNumber(v.comment_count),
+                shares: this.formatNumber(v.share_count),
+                views: this.formatNumber(v.view_count),
+                hashtags: v.hashtag_names || [],
+                createTime: new Date(v.create_time * 1000).toLocaleDateString('vi-VN'),
+                videoUrl: this.api.getVideoUrl(v.id, v.username)
+            }));
+            
+            if (result.sample) {
+                console.log('Using sample data - Add TikTok API key for real videos');
+            }
+            
+            this.renderVideoFeed();
+        } catch (error) {
+            console.error('Load videos error:', error);
+            // Fallback to sample data
+            this.videos = this.getFallbackVideos();
+            this.renderVideoFeed();
+        }
         
-        this.videos = this.sampleVideos;
-        this.renderVideoFeed();
         this.hideLoading();
         
         // Start playing first video
-        this.playCurrentVideo();
+        setTimeout(() => this.playCurrentVideo(), 500);
+    }
+    
+    formatNumber(num) {
+        if (num >= 1000000) {
+            return (num / 1000000).toFixed(1) + 'M';
+        }
+        if (num >= 1000) {
+            return (num / 1000).toFixed(1) + 'K';
+        }
+        return num.toString();
+    }
+    
+    getFallbackVideos() {
+        // Fallback sample videos
+        return [
+            {
+                id: '1',
+                author: '@tongtai_luxury',
+                desc: 'Tổng tài trong bộ vest đen 🖤 #tongtai #ceo #fyp',
+                thumbnail: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=600&fit=crop',
+                likes: '1.2M',
+                comments: '45.2K',
+                shares: '12.1K',
+                views: '5.8M',
+                hashtags: ['tongtai', 'ceo', 'fyp'],
+                createTime: '2 ngày trước',
+                videoUrl: 'https://www.tiktok.com/@tongtai_luxury/video/7234567890123456789'
+            },
+            {
+                id: '2',
+                author: '@ceo_official',
+                desc: 'A day in my life as CEO 💼 #ceo #morningroutine #tongtai',
+                thumbnail: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&h=600&fit=crop',
+                likes: '856.4K',
+                comments: '32.1K',
+                shares: '8.5K',
+                views: '3.2M',
+                hashtags: ['ceo', 'morningroutine', 'tongtai'],
+                createTime: '3 ngày trước',
+                videoUrl: 'https://www.tiktok.com/@ceo_official/video/7234567890123456790'
+            }
+        ];
     }
     
     renderVideoFeed() {
         this.videoFeed.innerHTML = this.videos.map((video, index) => `
-            <div class="video-item ${index === 0 ? 'active' : ''}" data-index="${index}">
-                <video 
-                    class="video-player"
-                    src="${video.videoUrl}"
-                    loop
-                    playsinline
-                    preload="metadata"
-                    poster="${video.avatar}"
-                ></video>
+            <div class="video-item ${index === 0 ? 'active' : ''}" data-index="${index}" data-url="${video.videoUrl}">
+                <div class="video-frame" id="video-${index}">
+                    <img src="${video.thumbnail}" class="video-thumbnail-img" alt="${video.desc}" loading="lazy">
+                    <div class="play-button-overlay" onclick="app.loadVideoPlayer(${index})">
+                        <div class="play-icon">▶</div>
+                    </div>
+                </div>
                 
                 <div class="video-overlay">
                     <div class="video-info">
                         <div class="author-row">
-                            <img src="${video.avatar}" class="author-avatar" alt="${video.author}">
+                            <img src="${video.thumbnail}" class="author-avatar" alt="${video.author}">
                             <span class="author-name">${video.author}</span>
-                            <button class="follow-btn" tabindex="-1">Follow</button>
+                            <span class="post-time">${video.createTime}</span>
                         </div>
                         <p class="video-desc">${this.formatDesc(video.desc)}</p>
                         <div class="music-row">
                             <span class="music-icon">♪</span>
-                            <span class="music-name">${video.music}</span>
+                            <span class="music-name">Nhạc nền - ${video.hashtags[0] || 'TikTok'}</span>
                         </div>
                     </div>
                     
                     <div class="action-buttons">
-                        <div class="action-btn">
+                        <div class="action-btn" onclick="app.likeVideo(${index})">
                             <div class="action-icon">♥</div>
                             <span>${video.likes}</span>
                         </div>
@@ -222,30 +186,62 @@ class TVBoxApp {
                             <div class="action-icon">💬</div>
                             <span>${video.comments}</span>
                         </div>
-                        <div class="action-btn">
+                        <div class="action-btn" onclick="app.shareVideo(${index})">
                             <div class="action-icon">↗</div>
                             <span>${video.shares}</span>
                         </div>
-                        <div class="action-btn">
-                            <div class="action-icon record-disc">💿</div>
-                        </div>
+                        <div class="action-btn record-disc">💿</div>
                     </div>
                 </div>
             </div>
         `).join('');
-        
-        // Add click handlers for action buttons
-        document.querySelectorAll('.action-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                btn.style.transform = 'scale(0.9)';
-                setTimeout(() => btn.style.transform = '', 150);
-            });
-        });
     }
     
     formatDesc(desc) {
         return desc.replace(/#(\w+)/g, '<span class="hashtag">#$1</span>');
+    }
+    
+    async loadVideoPlayer(index) {
+        const video = this.videos[index];
+        if (!video) return;
+        
+        const frame = document.getElementById(`video-${index}`);
+        
+        // Try to get oEmbed
+        try {
+            const embedData = await this.api.getVideoEmbed(video.videoUrl);
+            if (embedData && embedData.html) {
+                frame.innerHTML = embedData.html;
+            } else {
+                // Fallback: open in new tab
+                window.open(video.videoUrl, '_blank');
+            }
+        } catch (error) {
+            console.error('oEmbed error:', error);
+            window.open(video.videoUrl, '_blank');
+        }
+    }
+    
+    likeVideo(index) {
+        const btn = document.querySelectorAll('.action-btn')[index * 4];
+        btn.style.transform = 'scale(1.2)';
+        btn.querySelector('.action-icon').style.color = '#ff0050';
+        setTimeout(() => {
+            btn.style.transform = 'scale(1)';
+        }, 200);
+    }
+    
+    shareVideo(index) {
+        const video = this.videos[index];
+        if (navigator.share) {
+            navigator.share({
+                title: video.desc,
+                url: video.videoUrl
+            });
+        } else {
+            navigator.clipboard.writeText(video.videoUrl);
+            alert('Đã copy link!');
+        }
     }
     
     showLoading() {
@@ -260,26 +256,20 @@ class TVBoxApp {
     
     nextVideo() {
         if (this.isLoading || this.currentVideoIndex >= this.videos.length - 1) {
-            // Loop back to first video
             this.currentVideoIndex = -1;
         }
         
-        this.pauseCurrentVideo();
         this.currentVideoIndex++;
         this.updateActiveVideo();
-        this.playCurrentVideo();
     }
     
     prevVideo() {
         if (this.isLoading || this.currentVideoIndex <= 0) {
-            // Loop to last video
             this.currentVideoIndex = this.videos.length;
         }
         
-        this.pauseCurrentVideo();
         this.currentVideoIndex--;
         this.updateActiveVideo();
-        this.playCurrentVideo();
     }
     
     updateActiveVideo() {
@@ -288,7 +278,6 @@ class TVBoxApp {
             item.classList.toggle('active', index === this.currentVideoIndex);
         });
         
-        // Scroll to active video
         const activeItem = items[this.currentVideoIndex];
         if (activeItem) {
             activeItem.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -296,62 +285,20 @@ class TVBoxApp {
     }
     
     playCurrentVideo() {
-        const items = this.videoFeed.querySelectorAll('.video-item');
-        const activeItem = items[this.currentVideoIndex];
-        
-        if (activeItem) {
-            const video = activeItem.querySelector('video');
-            if (video) {
-                video.currentTime = 0;
-                video.play().catch(() => {
-                    // Auto-play blocked, show play button
-                    console.log('Autoplay blocked');
-                });
-            }
-        }
-    }
-    
-    pauseCurrentVideo() {
-        const items = this.videoFeed.querySelectorAll('.video-item');
-        const activeItem = items[this.currentVideoIndex];
-        
-        if (activeItem) {
-            const video = activeItem.querySelector('video');
-            if (video) {
-                video.pause();
-            }
-        }
+        // Auto load player for current video
+        setTimeout(() => {
+            this.loadVideoPlayer(this.currentVideoIndex);
+        }, 1000);
     }
     
     togglePlayPause() {
-        const items = this.videoFeed.querySelectorAll('.video-item');
-        const activeItem = items[this.currentVideoIndex];
-        
-        if (activeItem) {
-            const video = activeItem.querySelector('video');
-            if (video) {
-                if (video.paused) {
-                    video.play();
-                } else {
-                    video.pause();
-                }
-            }
-        }
+        // Handled by video player
     }
     
     toggleMute() {
-        const items = this.videoFeed.querySelectorAll('.video-item');
-        items.forEach(item => {
-            const video = item.querySelector('video');
-            if (video) {
-                video.muted = !video.muted;
-            }
-        });
-        
-        // Show mute indicator
+        // Handled by video player
         const indicator = document.getElementById('muteIndicator');
-        const isMuted = items[0]?.querySelector('video')?.muted;
-        indicator.textContent = isMuted ? '🔇' : '🔊';
+        indicator.textContent = indicator.textContent === '🔊' ? '🔇' : '🔊';
         indicator.classList.add('show');
         setTimeout(() => indicator.classList.remove('show'), 1000);
     }
@@ -359,10 +306,10 @@ class TVBoxApp {
 
 // Initialize app
 document.addEventListener('DOMContentLoaded', () => {
-    window.tvboxApp = new TVBoxApp();
+    window.app = new TVBoxApp();
 });
 
-// Register service worker for PWA
+// Register service worker
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
         navigator.serviceWorker.register('service-worker.js')

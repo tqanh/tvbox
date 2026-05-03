@@ -4,12 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="theme-color" content="#000000">
-    <meta name="description" content="TVBox - TikTok Tổng Tài for TV">
     <title>TVBox - TikTok Tổng Tài</title>
     
     <link rel="manifest" href="manifest.json">
     <link rel="icon" type="image/svg+xml" href="assets/icon.svg">
-    <link rel="apple-touch-icon" href="assets/icon.svg">
     
     <style>
         * {
@@ -40,32 +38,47 @@
             right: 0;
             z-index: 100;
             display: flex;
-            justify-content: center;
             align-items: center;
+            gap: 15px;
             padding: 15px 20px;
-            background: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent);
-        }
-        
-        .logo {
-            font-size: 24px;
-            font-weight: bold;
-            background: linear-gradient(45deg, #ff6b6b, #ff8e8e);
-            -webkit-background-clip: text;
-            background-clip: text;
-            -webkit-text-fill-color: transparent;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.9), transparent);
         }
         
         .back-btn {
-            position: absolute;
-            left: 20px;
             color: #fff;
             text-decoration: none;
             font-size: 16px;
             opacity: 0.8;
+            min-width: 40px;
         }
         
         .back-btn:hover {
             opacity: 1;
+        }
+        
+        .search-box {
+            flex: 1;
+            max-width: 400px;
+        }
+        
+        .search-box input {
+            width: 100%;
+            padding: 10px 20px;
+            border-radius: 25px;
+            border: 2px solid rgba(255,255,255,0.2);
+            background: rgba(255,255,255,0.1);
+            color: #fff;
+            font-size: 16px;
+            outline: none;
+        }
+        
+        .search-box input:focus {
+            border-color: #ff0050;
+            background: rgba(255,255,255,0.15);
+        }
+        
+        .search-box input::placeholder {
+            color: rgba(255,255,255,0.5);
         }
         
         /* Video Container */
@@ -75,6 +88,7 @@
             overflow-y: scroll;
             scroll-snap-type: y mandatory;
             scroll-behavior: smooth;
+            padding-top: 70px;
         }
         
         .video-container::-webkit-scrollbar {
@@ -83,7 +97,7 @@
         
         /* Video Item */
         .video-item {
-            height: 100vh;
+            height: calc(100vh - 70px);
             width: 100%;
             position: relative;
             scroll-snap-align: start;
@@ -93,12 +107,45 @@
             background: #000;
         }
         
-        .video-player {
-            height: 100%;
+        .video-frame {
             width: 100%;
-            max-width: 100vh;
+            height: 100%;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .video-thumbnail-img {
+            max-width: 100%;
+            max-height: 100%;
             object-fit: contain;
-            background: #000;
+        }
+        
+        .play-button-overlay {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 80px;
+            height: 80px;
+            background: rgba(255,0,80,0.8);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        
+        .play-button-overlay:hover {
+            transform: translate(-50%, -50%) scale(1.1);
+        }
+        
+        .play-icon {
+            font-size: 32px;
+            color: #fff;
+            margin-left: 5px;
         }
         
         /* Video Overlay */
@@ -107,8 +154,8 @@
             bottom: 0;
             left: 0;
             right: 100px;
-            padding: 100px 20px 120px;
-            background: linear-gradient(transparent, rgba(0,0,0,0.8));
+            padding: 80px 20px 100px;
+            background: linear-gradient(transparent, rgba(0,0,0,0.9));
             pointer-events: none;
         }
         
@@ -120,7 +167,7 @@
             display: flex;
             align-items: center;
             gap: 12px;
-            margin-bottom: 12px;
+            margin-bottom: 10px;
         }
         
         .author-avatar {
@@ -136,26 +183,20 @@
             font-weight: 600;
         }
         
-        .follow-btn {
-            background: #ff6b6b;
-            color: #fff;
-            border: none;
-            padding: 6px 16px;
-            border-radius: 4px;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            pointer-events: auto;
+        .post-time {
+            font-size: 12px;
+            opacity: 0.6;
+            margin-left: auto;
         }
         
         .video-desc {
             font-size: 15px;
-            line-height: 1.5;
-            margin-bottom: 10px;
+            line-height: 1.4;
+            margin-bottom: 8px;
         }
         
         .hashtag {
-            color: #ff6b6b;
+            color: #ff0050;
             font-weight: 500;
         }
         
@@ -163,18 +204,12 @@
             display: flex;
             align-items: center;
             gap: 8px;
-            font-size: 14px;
+            font-size: 13px;
             opacity: 0.9;
         }
         
         .music-icon {
             animation: spin 3s linear infinite;
-        }
-        
-        .music-name {
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
         }
         
         @keyframes spin {
@@ -186,10 +221,10 @@
         .action-buttons {
             position: absolute;
             right: 10px;
-            bottom: 120px;
+            bottom: 100px;
             display: flex;
             flex-direction: column;
-            gap: 20px;
+            gap: 15px;
             pointer-events: auto;
         }
         
@@ -208,19 +243,20 @@
         }
         
         .action-icon {
-            width: 48px;
-            height: 48px;
+            width: 44px;
+            height: 44px;
             background: rgba(255,255,255,0.1);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 24px;
+            font-size: 22px;
             backdrop-filter: blur(10px);
+            transition: color 0.2s;
         }
         
         .action-btn span {
-            font-size: 12px;
+            font-size: 11px;
             font-weight: 500;
         }
         
@@ -228,7 +264,7 @@
             animation: spin 5s linear infinite;
         }
         
-        /* Loading Indicator */
+        /* Loading */
         .loading-indicator {
             position: fixed;
             top: 50%;
@@ -246,33 +282,33 @@
             width: 40px;
             height: 40px;
             border: 3px solid rgba(255,255,255,0.2);
-            border-top-color: #ff6b6b;
+            border-top-color: #ff0050;
             border-radius: 50%;
             animation: spin 1s linear infinite;
         }
         
-        /* Navigation Hints */
+        /* Hints */
         .nav-hints {
             position: fixed;
             bottom: 20px;
             left: 50%;
             transform: translateX(-50%);
             background: rgba(0,0,0,0.7);
-            padding: 12px 24px;
-            border-radius: 30px;
+            padding: 10px 20px;
+            border-radius: 25px;
             display: flex;
-            gap: 20px;
+            gap: 15px;
             align-items: center;
             z-index: 100;
-            font-size: 13px;
+            font-size: 12px;
             color: #fff;
             opacity: 0.9;
         }
         
         .nav-hints kbd {
             background: rgba(255,255,255,0.2);
-            padding: 4px 10px;
-            border-radius: 5px;
+            padding: 3px 8px;
+            border-radius: 4px;
             font-family: inherit;
         }
         
@@ -296,30 +332,27 @@
             opacity: 1;
         }
         
-        /* Play/Pause Overlay */
-        .play-overlay {
-            position: absolute;
-            top: 50%;
+        /* API Key Notice */
+        .api-notice {
+            position: fixed;
+            top: 80px;
             left: 50%;
-            transform: translate(-50%, -50%);
-            font-size: 80px;
-            color: rgba(255,255,255,0.8);
-            opacity: 0;
-            transition: opacity 0.3s;
-            pointer-events: none;
-            z-index: 60;
-        }
-        
-        .play-overlay.show {
-            opacity: 1;
+            transform: translateX(-50%);
+            background: rgba(255,0,80,0.9);
+            color: #fff;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 12px;
+            z-index: 90;
+            display: none;
         }
         
         /* TV Optimizations */
         @media (min-width: 1024px) {
             .action-icon {
-                width: 60px;
-                height: 60px;
-                font-size: 28px;
+                width: 56px;
+                height: 56px;
+                font-size: 26px;
             }
             
             .author-name {
@@ -330,23 +363,45 @@
                 font-size: 18px;
             }
             
+            .search-box input {
+                font-size: 20px;
+                padding: 12px 24px;
+            }
+            
             .nav-hints {
-                font-size: 16px;
-                padding: 15px 30px;
+                font-size: 14px;
+                padding: 12px 24px;
             }
             
             .nav-hints kbd {
-                padding: 6px 14px;
+                padding: 4px 10px;
             }
+        }
+        
+        /* Focus styles */
+        .action-btn:focus {
+            outline: 2px solid #ff0050;
+            outline-offset: 2px;
+            border-radius: 50%;
+        }
+        
+        .search-box input:focus {
+            outline: 2px solid #ff0050;
         }
     </style>
 </head>
 <body>
     <div class="app-container">
         <header class="header">
-            <a href="index.html" class="back-btn">← Back</a>
-            <div class="logo">TVBox</div>
+            <a href="index.html" class="back-btn">←</a>
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="Tìm kiếm tổng tài..." value="tổng tài">
+            </div>
         </header>
+        
+        <div class="api-notice" id="apiNotice">
+            Đang dùng dữ liệu mẫu - Thêm API key để tìm video thật
+        </div>
         
         <div class="video-container" id="videoContainer">
             <div class="video-feed" id="videoFeed"></div>
@@ -362,11 +417,12 @@
         <div class="nav-hints">
             <span><kbd>↑</kbd> Prev</span>
             <span><kbd>↓</kbd> Next</span>
-            <span><kbd>Enter</kbd> Play</span>
+            <span><kbd>Enter</kbd> Mở</span>
             <span><kbd>Esc</kbd> Mute</span>
         </div>
     </div>
     
+    <script src="api.js"></script>
     <script src="app.js"></script>
     <script>
         if ('serviceWorker' in navigator) {
