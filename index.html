@@ -4,12 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="theme-color" content="#000000">
-    <meta name="description" content="TVBox - Xem video TikTok tổng tài trên TV">
+    <meta name="description" content="TVBox - TikTok Tổng Tài for TV">
     <title>TVBox - TikTok Tổng Tài</title>
     
     <link rel="manifest" href="manifest.json">
     <link rel="icon" type="image/svg+xml" href="assets/icon.svg">
-    <link rel="apple-touch-icon" href="assets/icon-192.png">
+    <link rel="apple-touch-icon" href="assets/icon.svg">
     
     <style>
         * {
@@ -21,316 +21,348 @@
         html, body {
             height: 100%;
             overflow: hidden;
-        }
-        
-        body {
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
-            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-            color: #fff;
+            background: #000;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
         }
         
         .app-container {
             height: 100vh;
-            display: flex;
-            flex-direction: column;
+            width: 100vw;
+            position: relative;
+            background: #000;
         }
         
+        /* Header */
         .header {
-            padding: 20px 40px;
-            background: rgba(0,0,0,0.3);
-            backdrop-filter: blur(10px);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
             display: flex;
+            justify-content: center;
             align-items: center;
-            gap: 20px;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding: 15px 20px;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent);
         }
         
         .logo {
-            font-size: 32px;
+            font-size: 24px;
             font-weight: bold;
             background: linear-gradient(45deg, #ff6b6b, #ff8e8e);
             -webkit-background-clip: text;
             background-clip: text;
             -webkit-text-fill-color: transparent;
-            text-shadow: 0 0 30px rgba(255,107,107,0.3);
         }
         
-        .search-box {
-            flex: 1;
-            max-width: 500px;
-            position: relative;
-        }
-        
-        .search-box input {
-            width: 100%;
-            padding: 15px 25px;
-            font-size: 20px;
-            border: 2px solid rgba(255,255,255,0.2);
-            border-radius: 30px;
-            background: rgba(255,255,255,0.1);
+        .search-hint {
+            position: absolute;
+            right: 20px;
+            font-size: 14px;
+            opacity: 0.7;
             color: #fff;
-            outline: none;
-            transition: all 0.3s;
         }
         
-        .search-box input:focus {
-            border-color: #ff6b6b;
-            background: rgba(255,255,255,0.15);
-        }
-        
-        .search-box input::placeholder {
-            color: rgba(255,255,255,0.5);
-        }
-        
-        .category-tabs {
-            display: flex;
-            gap: 15px;
-            padding: 20px 40px;
-            background: rgba(0,0,0,0.2);
-            overflow-x: auto;
-        }
-        
-        .category-tab {
-            padding: 12px 30px;
-            font-size: 18px;
-            border: 2px solid rgba(255,255,255,0.2);
-            border-radius: 25px;
-            background: rgba(255,255,255,0.05);
-            color: #fff;
-            cursor: pointer;
-            transition: all 0.3s;
-            white-space: nowrap;
-            outline: none;
-        }
-        
-        .category-tab:hover,
-        .category-tab:focus {
-            border-color: #ff6b6b;
-            background: rgba(255,107,107,0.2);
-            transform: scale(1.05);
-        }
-        
-        .category-tab.active {
-            background: linear-gradient(45deg, #ff6b6b, #ff8e8e);
-            border-color: transparent;
-        }
-        
-        .video-grid {
-            flex: 1;
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-            gap: 25px;
-            padding: 30px 40px;
-            overflow-y: auto;
-            overflow-x: hidden;
-        }
-        
-        .video-card {
-            position: relative;
-            aspect-ratio: 9/16;
-            border-radius: 16px;
-            overflow: hidden;
-            background: rgba(0,0,0,0.3);
-            cursor: pointer;
-            transition: all 0.3s;
-            border: 3px solid transparent;
-            outline: none;
-        }
-        
-        .video-card:hover,
-        .video-card:focus {
-            transform: scale(1.05);
-            border-color: #ff6b6b;
-            box-shadow: 0 0 40px rgba(255,107,107,0.4);
-            z-index: 10;
-        }
-        
-        .video-thumbnail {
-            width: 100%;
+        /* Video Container */
+        .video-container {
             height: 100%;
-            object-fit: cover;
+            width: 100%;
+            overflow-y: scroll;
+            scroll-snap-type: y mandatory;
+            scroll-behavior: smooth;
         }
         
-        .video-info {
+        .video-container::-webkit-scrollbar {
+            display: none;
+        }
+        
+        /* Video Item */
+        .video-item {
+            height: 100vh;
+            width: 100%;
+            position: relative;
+            scroll-snap-align: start;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #000;
+        }
+        
+        .video-player {
+            height: 100%;
+            width: 100%;
+            max-width: 100vh;
+            object-fit: contain;
+            background: #000;
+        }
+        
+        /* Video Overlay */
+        .video-overlay {
             position: absolute;
             bottom: 0;
             left: 0;
-            right: 0;
-            padding: 60px 15px 15px;
-            background: linear-gradient(transparent, rgba(0,0,0,0.9));
+            right: 100px;
+            padding: 100px 20px 120px;
+            background: linear-gradient(transparent, rgba(0,0,0,0.8));
+            pointer-events: none;
         }
         
-        .video-author {
-            font-size: 18px;
+        .video-info {
+            color: #fff;
+        }
+        
+        .author-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+        
+        .author-avatar {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #fff;
+        }
+        
+        .author-name {
+            font-size: 16px;
             font-weight: 600;
-            margin-bottom: 5px;
+        }
+        
+        .follow-btn {
+            background: #ff6b6b;
+            color: #fff;
+            border: none;
+            padding: 6px 16px;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            pointer-events: auto;
         }
         
         .video-desc {
-            font-size: 14px;
-            opacity: 0.8;
-            display: -webkit-box;
-            display: box;
-            -webkit-line-clamp: 2;
-            line-clamp: 2;
-            -webkit-box-orient: vertical;
-            box-orient: vertical;
-            overflow: hidden;
+            font-size: 15px;
+            line-height: 1.5;
+            margin-bottom: 10px;
         }
         
-        .video-stats {
+        .hashtag {
+            color: #ff6b6b;
+            font-weight: 500;
+        }
+        
+        .music-row {
             display: flex;
-            gap: 15px;
-            margin-top: 8px;
-            font-size: 13px;
-            opacity: 0.7;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            opacity: 0.9;
         }
         
-        .play-overlay {
+        .music-icon {
+            animation: spin 3s linear infinite;
+        }
+        
+        .music-name {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        
+        /* Action Buttons */
+        .action-buttons {
             position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 80px;
-            height: 80px;
-            background: rgba(255,107,107,0.9);
+            right: 10px;
+            bottom: 120px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            pointer-events: auto;
+        }
+        
+        .action-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            color: #fff;
+            cursor: pointer;
+            transition: transform 0.1s;
+        }
+        
+        .action-btn:active {
+            transform: scale(0.9);
+        }
+        
+        .action-icon {
+            width: 48px;
+            height: 48px;
+            background: rgba(255,255,255,0.1);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            opacity: 0;
-            transition: opacity 0.3s;
+            font-size: 24px;
+            backdrop-filter: blur(10px);
         }
         
-        .video-card:hover .play-overlay,
-        .video-card:focus .play-overlay {
-            opacity: 1;
+        .action-btn span {
+            font-size: 12px;
+            font-weight: 500;
         }
         
-        .play-overlay::after {
-            content: '';
-            border-left: 30px solid #fff;
-            border-top: 20px solid transparent;
-            border-bottom: 20px solid transparent;
-            margin-left: 8px;
+        .record-disc {
+            animation: spin 5s linear infinite;
         }
         
-        .loading {
-            display: flex;
+        /* Loading Indicator */
+        .loading-indicator {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 200;
+            display: none;
+            flex-direction: column;
             align-items: center;
-            justify-content: center;
-            height: 200px;
-            font-size: 20px;
-            opacity: 0.7;
+            gap: 15px;
+            color: #fff;
         }
         
         .spinner {
             width: 40px;
             height: 40px;
-            border: 4px solid rgba(255,255,255,0.2);
+            border: 3px solid rgba(255,255,255,0.2);
             border-top-color: #ff6b6b;
             border-radius: 50%;
             animation: spin 1s linear infinite;
-            margin-right: 15px;
         }
         
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-        
-        .video-modal {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0,0,0,0.95);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            z-index: 1000;
-        }
-        
-        .video-modal.active {
-            display: flex;
-        }
-        
-        .video-player {
-            width: 100%;
-            height: 100%;
-            max-width: 500px;
-            background: #000;
-        }
-        
-        .video-player iframe {
-            width: 100%;
-            height: 100%;
-            border: none;
-        }
-        
-        .close-btn {
-            position: absolute;
-            top: 30px;
-            right: 30px;
-            width: 60px;
-            height: 60px;
-            background: rgba(255,255,255,0.1);
-            border: 2px solid rgba(255,255,255,0.3);
-            border-radius: 50%;
-            color: #fff;
-            font-size: 30px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s;
-            outline: none;
-        }
-        
-        .close-btn:hover,
-        .close-btn:focus {
-            background: #ff6b6b;
-            border-color: #ff6b6b;
-        }
-        
-        .hint-bar {
+        /* Navigation Hints */
+        .nav-hints {
             position: fixed;
             bottom: 20px;
             left: 50%;
             transform: translateX(-50%);
             background: rgba(0,0,0,0.7);
-            padding: 12px 30px;
+            padding: 12px 24px;
             border-radius: 30px;
-            font-size: 14px;
-            opacity: 0.8;
+            display: flex;
+            gap: 20px;
+            align-items: center;
             z-index: 100;
+            font-size: 13px;
+            color: #fff;
+            opacity: 0.9;
         }
         
-        .hint-bar kbd {
+        .nav-hints kbd {
             background: rgba(255,255,255,0.2);
             padding: 4px 10px;
             border-radius: 5px;
-            margin: 0 3px;
+            font-family: inherit;
         }
         
-        @media (max-width: 768px) {
-            .video-grid {
-                grid-template-columns: repeat(2, 1fr);
-                padding: 15px;
+        /* Mute Indicator */
+        .mute-indicator {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 48px;
+            z-index: 300;
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+            background: rgba(0,0,0,0.7);
+            padding: 20px;
+            border-radius: 50%;
+        }
+        
+        .mute-indicator.show {
+            opacity: 1;
+        }
+        
+        /* Progress Bar */
+        .progress-bar {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: rgba(255,255,255,0.2);
+            z-index: 50;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: #ff6b6b;
+            width: 0%;
+            transition: width 0.1s linear;
+        }
+        
+        /* Play/Pause Overlay */
+        .play-overlay {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 80px;
+            color: rgba(255,255,255,0.8);
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+            z-index: 60;
+        }
+        
+        .play-overlay.show {
+            opacity: 1;
+        }
+        
+        /* TV Optimizations */
+        @media (min-width: 1024px) {
+            .action-icon {
+                width: 60px;
+                height: 60px;
+                font-size: 28px;
             }
             
-            .header {
-                padding: 15px 20px;
+            .author-name {
+                font-size: 20px;
             }
             
-            .logo {
-                font-size: 24px;
+            .video-desc {
+                font-size: 18px;
             }
             
-            .search-box input {
+            .nav-hints {
                 font-size: 16px;
-                padding: 12px 18px;
+                padding: 15px 30px;
             }
+            
+            .nav-hints kbd {
+                padding: 6px 14px;
+            }
+        }
+        
+        /* Focus styles for TV navigation */
+        .action-btn:focus {
+            outline: 2px solid #ff6b6b;
+            outline-offset: 4px;
+            border-radius: 50%;
+        }
+        
+        .follow-btn:focus {
+            outline: 2px solid #fff;
+            outline-offset: 2px;
         }
     </style>
 </head>
@@ -338,43 +370,32 @@
     <div class="app-container">
         <header class="header">
             <div class="logo">TVBox</div>
-            <div class="search-box">
-                <input type="text" id="searchInput" placeholder="Tìm kiếm tổng tài..." tabindex="1">
-            </div>
+            <div class="search-hint">Tổng Tài</div>
         </header>
         
-        <div class="category-tabs">
-            <button class="category-tab active" data-category="tongtai" tabindex="2">Tổng Tài</button>
-            <button class="category-tab" data-category="ceo" tabindex="3">CEO</button>
-            <button class="category-tab" data-category="badboy" tabindex="4">Bad Boy</button>
-            <button class="category-tab" data-category="gentleman" tabindex="5">Quý Ông</button>
-            <button class="category-tab" data-category="fashion" tabindex="6">Thời Trang</button>
-            <button class="category-tab" data-category="luxury" tabindex="7">Luxury</button>
+        <div class="video-container" id="videoContainer">
+            <div class="video-feed" id="videoFeed"></div>
         </div>
         
-        <main class="video-grid" id="videoGrid">
-            <div class="loading">
-                <div class="spinner"></div>
-                Đang tải video...
-            </div>
-        </main>
-    </div>
-    
-    <div class="video-modal" id="videoModal">
-        <button class="close-btn" id="closeBtn" tabindex="100">×</button>
-        <div class="video-player" id="videoPlayer"></div>
-    </div>
-    
-    <div class="hint-bar">
-        <kbd>↑↓←→</kbd> Di chuyển <kbd>Enter</kbd> Chọn <kbd>Esc</kbd> Quay lại
+        <div class="loading-indicator" id="loadingIndicator">
+            <div class="spinner"></div>
+            <span>Đang tải...</span>
+        </div>
+        
+        <div class="mute-indicator" id="muteIndicator">🔊</div>
+        
+        <div class="nav-hints">
+            <span><kbd>↑</kbd> Prev</span>
+            <span><kbd>↓</kbd> Next</span>
+            <span><kbd>Enter</kbd> Play</span>
+            <span><kbd>Esc</kbd> Mute</span>
+        </div>
     </div>
     
     <script src="app.js"></script>
     <script>
         if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('service-worker.js')
-                .then(reg => console.log('Service Worker registered'))
-                .catch(err => console.log('Service Worker registration failed'));
+            navigator.serviceWorker.register('service-worker.js');
         }
     </script>
 </body>
