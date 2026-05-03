@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1a1a2e"/>
+      <stop offset="50%" style="stop-color:#16213e"/>
+      <stop offset="100%" style="stop-color:#0f3460"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#ff6b6b"/>
+      <stop offset="100%" style="stop-color:#ff8e8e"/>
+    </linearGradient>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="512" height="512" rx="80" fill="url(#bg)"/>
+  
+  <!-- TV Box shape -->
+  <rect x="56" y="140" width="400" height="232" rx="20" fill="url(#accent)"/>
+  <rect x="76" y="160" width="360" height="192" rx="12" fill="#1a1a2e"/>
+  
+  <!-- Screen glow -->
+  <rect x="96" y="180" width="320" height="152" rx="8" fill="url(#accent)" opacity="0.3"/>
+  
+  <!-- Play button -->
+  <circle cx="256" cy="256" r="50" fill="url(#accent)"/>
+  <polygon points="275,256 238,278 238,234" fill="#1a1a2e"/>
+  
+  <!-- Crown symbol for Tổng Tài -->
+  <g transform="translate(0, -30)">
+    <polygon points="256,70 276,110 316,110 286,135 296,175 256,150 216,175 226,135 196,110 236,110" fill="url(#accent)"/>
+  </g>
+  
+  <!-- Remote control dots -->
+  <circle cx="430" cy="200" r="6" fill="#ff6b6b"/>
+  <circle cx="430" cy="220" r="6" fill="#ff6b6b"/>
+  <circle cx="430" cy="240" r="6" fill="#ff6b6b"/>
+</svg>

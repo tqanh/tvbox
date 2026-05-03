@@ -1,0 +1,23 @@
+{
+  "name": "TVBox - TikTok Tổng Tài",
+  "short_name": "TVBox",
+  "description": "Xem video TikTok tổng tài, CEO trên TV Box",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#1a1a2e",
+  "theme_color": "#ff6b6b",
+  "orientation": "landscape",
+  "scope": "/",
+  "icons": [
+    {
+      "src": "assets/icon.svg",
+      "sizes": "72x72 96x96 128x128 144x144 152x152 192x192 384x384 512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["entertainment", "video"],
+  "lang": "vi",
+  "dir": "ltr",
+  "prefer_related_applications": false
+}
