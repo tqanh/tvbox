@@ -149,7 +149,7 @@ class TVBoxApp {
                 views: '5.8M',
                 hashtags: ['tongtai', 'ceo', 'fyp'],
                 createTime: '2 ngày trước',
-                videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4'
+                videoUrl: 'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4'
             },
             {
                 id: '2',
@@ -162,7 +162,7 @@ class TVBoxApp {
                 views: '3.2M',
                 hashtags: ['ceo', 'morningroutine', 'tongtai'],
                 createTime: '3 ngày trước',
-                videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4'
+                videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4'
             }
         ];
     }

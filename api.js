@@ -187,14 +187,14 @@ class TikTokAPI {
     
     // Get video URL from ID - return sample MP4 videos for demo
     getVideoUrl(videoId, username) {
-        // Map video IDs to sample MP4 videos
+        // Map video IDs to sample MP4 videos (using reliable sources without CORS issues)
         const sampleVideos = {
-            '7234567890123456789': 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
-            '7234567890123456790': 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4',
-            '7234567890123456791': 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
-            '7234567890123456792': 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4',
-            '7234567890123456793': 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4',
-            '7234567890123456794': 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4'
+            '7234567890123456789': 'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4',
+            '7234567890123456790': 'https://www.w3schools.com/html/mov_bbb.mp4',
+            '7234567890123456791': 'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/friday.mp4',
+            '7234567890123456792': 'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/sintel-short.mp4',
+            '7234567890123456793': 'https://www.w3schools.com/html/mov_bbb.mp4',
+            '7234567890123456794': 'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4'
         };
         
         return sampleVideos[videoId] || `https://www.tiktok.com/${username}/video/${videoId}`;
