@@ -276,6 +276,10 @@ class TVBoxApp {
             .close-btn:hover {
                 background: #ff1a66;
             }
+            .close-btn:focus {
+                outline: 2px solid #fff;
+                outline-offset: 2px;
+            }
             .video-embed-container {
                 flex: 1;
                 display: flex;
@@ -314,16 +318,54 @@ class TVBoxApp {
                 font-size: 14px;
                 opacity: 0.7;
             }
-            .external-link {
-                background: #fff;
-                color: #000;
+            .external-link-btn {
+                background: #ff0050;
+                color: #fff;
                 padding: 15px 30px;
                 border-radius: 8px;
                 text-decoration: none;
-                font-size: 16px;
+                font-size: 18px;
                 font-weight: 600;
                 display: inline-block;
                 margin-top: 20px;
+                border: none;
+                cursor: pointer;
+            }
+            .external-link-btn:hover {
+                background: #ff1a66;
+            }
+            .external-link-btn:focus {
+                outline: 2px solid #fff;
+                outline-offset: 2px;
+            }
+            .thumbnail-container {
+                text-align: center;
+                position: relative;
+            }
+            .thumbnail-container img {
+                max-width: 100%;
+                max-height: 60vh;
+                border-radius: 12px;
+                object-fit: contain;
+            }
+            .play-overlay {
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                width: 80px;
+                height: 80px;
+                background: rgba(255,0,80,0.8);
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                cursor: pointer;
+            }
+            .play-overlay span {
+                font-size: 32px;
+                color: #fff;
+                margin-left: 5px;
             }
         `;
         
@@ -331,41 +373,33 @@ class TVBoxApp {
         document.body.appendChild(modal);
         this.isModalOpen = true;
         
-        // Try to get oEmbed
+        // Show thumbnail with play button immediately
+        const container = document.getElementById('embedContainer');
+        container.innerHTML = `
+            <div class="thumbnail-container">
+                <img src="${video.thumbnail}" alt="${video.desc}">
+                <div class="play-overlay" id="playOverlay">
+                    <span>▶</span>
+                </div>
+                <button class="external-link-btn" id="openTikTokBtn" onclick="window.location.href='${video.videoUrl}'">
+                    Xem trên TikTok
+                </button>
+            </div>
+        `;
+        
+        // Try to get oEmbed (may fail due to CORS, but that's ok)
         try {
             const embedData = await this.api.getVideoEmbed(video.videoUrl);
-            const container = document.getElementById('embedContainer');
-            
             if (embedData && embedData.html) {
                 container.innerHTML = embedData.html;
-                
-                // Execute TikTok embed script
-                if (window.tiktokEmbed) {
-                    window.tiktokEmbed.reload();
-                }
-            } else {
-                // Show fallback with link
-                container.innerHTML = `
-                    <div style="text-align: center; color: #fff;">
-                        <p>Không thể nhúng video trực tiếp</p>
-                        <a href="${video.videoUrl}" class="external-link" target="_blank">
-                            Mở trên TikTok
-                        </a>
-                    </div>
-                `;
             }
         } catch (error) {
-            console.error('oEmbed error:', error);
-            const container = document.getElementById('embedContainer');
-            container.innerHTML = `
-                <div style="text-align: center; color: #fff;">
-                    <p>Không thể tải video</p>
-                    <a href="${video.videoUrl}" class="external-link" target="_blank">
-                        Mở trên TikTok
-                    </a>
-                </div>
-            `;
+            console.log('oEmbed failed (expected due to CORS), using fallback');
+            // Keep the thumbnail fallback that's already shown
         }
+        
+        // Focus the close button for keyboard navigation
+        document.querySelector('.close-btn').focus();
     }
     
     closeVideoModal() {
