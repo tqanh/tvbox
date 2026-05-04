@@ -6,6 +6,7 @@ class TVBoxApp {
         this.videos = [];
         this.currentVideoIndex = 0;
         this.isLoading = false;
+        this.isModalOpen = false;
         this.api = new TikTokAPI();
         this.searchKeyword = 'tổng tài';
         
@@ -41,6 +42,15 @@ class TVBoxApp {
     }
     
     handleKeyNavigation(e) {
+        // If modal is open, close it on Escape/Backspace
+        if (this.isModalOpen) {
+            if (e.key === 'Escape' || e.key === 'Backspace') {
+                e.preventDefault();
+                this.closeVideoModal();
+                return;
+            }
+        }
+        
         switch(e.key) {
             case 'ArrowUp':
             case 'ArrowLeft':
@@ -57,13 +67,17 @@ class TVBoxApp {
                 
             case 'Enter':
                 e.preventDefault();
-                this.togglePlayPause();
+                this.loadVideoPlayer(this.currentVideoIndex);
                 break;
                 
             case 'Escape':
             case 'Backspace':
                 e.preventDefault();
-                this.toggleMute();
+                // If on landing page, do nothing
+                // If on player page, go back
+                if (window.location.pathname.includes('player.html')) {
+                    window.location.href = 'index.html';
+                }
                 break;
                 
             case 'm':
@@ -205,21 +219,161 @@ class TVBoxApp {
         const video = this.videos[index];
         if (!video) return;
         
-        const frame = document.getElementById(`video-${index}`);
+        // Create full-screen video modal
+        const modal = document.createElement('div');
+        modal.id = 'videoModal';
+        modal.className = 'video-modal';
+        modal.innerHTML = `
+            <div class="modal-content">
+                <button class="close-btn" onclick="app.closeVideoModal()">← Quay lại</button>
+                <div class="video-embed-container" id="embedContainer">
+                    <div class="loading">Đang tải video...</div>
+                </div>
+                <div class="video-info-modal">
+                    <h3>${video.author}</h3>
+                    <p>${video.desc}</p>
+                    <div class="stats">
+                        <span>♥ ${video.likes}</span>
+                        <span>💬 ${video.comments}</span>
+                        <span>↗ ${video.shares}</span>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        // Add styles
+        modal.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+        `;
+        
+        const style = document.createElement('style');
+        style.textContent = `
+            .modal-content {
+                flex: 1;
+                display: flex;
+                flex-direction: column;
+                padding: 20px;
+            }
+            .close-btn {
+                background: #ff0050;
+                color: #fff;
+                border: none;
+                padding: 12px 24px;
+                border-radius: 8px;
+                font-size: 16px;
+                cursor: pointer;
+                margin-bottom: 20px;
+                align-self: flex-start;
+            }
+            .close-btn:hover {
+                background: #ff1a66;
+            }
+            .video-embed-container {
+                flex: 1;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                min-height: 400px;
+            }
+            .video-embed-container iframe {
+                width: 100%;
+                max-width: 400px;
+                height: 600px;
+                border: none;
+                border-radius: 12px;
+            }
+            .video-embed-container .loading {
+                color: #fff;
+                font-size: 18px;
+            }
+            .video-info-modal {
+                padding: 20px 0;
+                color: #fff;
+            }
+            .video-info-modal h3 {
+                font-size: 20px;
+                margin-bottom: 10px;
+            }
+            .video-info-modal p {
+                font-size: 16px;
+                opacity: 0.8;
+                margin-bottom: 15px;
+                line-height: 1.4;
+            }
+            .video-info-modal .stats {
+                display: flex;
+                gap: 20px;
+                font-size: 14px;
+                opacity: 0.7;
+            }
+            .external-link {
+                background: #fff;
+                color: #000;
+                padding: 15px 30px;
+                border-radius: 8px;
+                text-decoration: none;
+                font-size: 16px;
+                font-weight: 600;
+                display: inline-block;
+                margin-top: 20px;
+            }
+        `;
+        
+        document.head.appendChild(style);
+        document.body.appendChild(modal);
+        this.isModalOpen = true;
         
         // Try to get oEmbed
         try {
             const embedData = await this.api.getVideoEmbed(video.videoUrl);
+            const container = document.getElementById('embedContainer');
+            
             if (embedData && embedData.html) {
-                frame.innerHTML = embedData.html;
+                container.innerHTML = embedData.html;
+                
+                // Execute TikTok embed script
+                if (window.tiktokEmbed) {
+                    window.tiktokEmbed.reload();
+                }
             } else {
-                // Fallback: open in new tab
-                window.open(video.videoUrl, '_blank');
+                // Show fallback with link
+                container.innerHTML = `
+                    <div style="text-align: center; color: #fff;">
+                        <p>Không thể nhúng video trực tiếp</p>
+                        <a href="${video.videoUrl}" class="external-link" target="_blank">
+                            Mở trên TikTok
+                        </a>
+                    </div>
+                `;
             }
         } catch (error) {
             console.error('oEmbed error:', error);
-            window.open(video.videoUrl, '_blank');
+            const container = document.getElementById('embedContainer');
+            container.innerHTML = `
+                <div style="text-align: center; color: #fff;">
+                    <p>Không thể tải video</p>
+                    <a href="${video.videoUrl}" class="external-link" target="_blank">
+                        Mở trên TikTok
+                    </a>
+                </div>
+            `;
         }
+    }
+    
+    closeVideoModal() {
+        const modal = document.getElementById('videoModal');
+        if (modal) {
+            modal.remove();
+        }
+        this.isModalOpen = false;
     }
     
     likeVideo(index) {
