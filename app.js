@@ -149,7 +149,7 @@ class TVBoxApp {
                 views: '5.8M',
                 hashtags: ['tongtai', 'ceo', 'fyp'],
                 createTime: '2 ngày trước',
-                videoUrl: 'https://www.tiktok.com/@tongtai_luxury/video/7234567890123456789'
+                videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4'
             },
             {
                 id: '2',
@@ -162,7 +162,7 @@ class TVBoxApp {
                 views: '3.2M',
                 hashtags: ['ceo', 'morningroutine', 'tongtai'],
                 createTime: '3 ngày trước',
-                videoUrl: 'https://www.tiktok.com/@ceo_official/video/7234567890123456790'
+                videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4'
             }
         ];
     }
@@ -219,15 +219,18 @@ class TVBoxApp {
         const video = this.videos[index];
         if (!video) return;
         
-        // Create full-screen video modal
+        // Create full-screen video player
         const modal = document.createElement('div');
         modal.id = 'videoModal';
         modal.className = 'video-modal';
         modal.innerHTML = `
             <div class="modal-content">
                 <button class="close-btn" onclick="app.closeVideoModal()">← Quay lại</button>
-                <div class="video-embed-container" id="embedContainer">
-                    <div class="loading">Đang tải video...</div>
+                <div class="video-player-container" id="videoPlayerContainer">
+                    <video id="activeVideo" autoplay muted playsinline controls>
+                        <source src="${video.videoUrl}" type="video/mp4">
+                        Trình duyệt không hỗ trợ video.
+                    </video>
                 </div>
                 <div class="video-info-modal">
                     <h3>${video.author}</h3>
@@ -272,6 +275,7 @@ class TVBoxApp {
                 cursor: pointer;
                 margin-bottom: 20px;
                 align-self: flex-start;
+                z-index: 10;
             }
             .close-btn:hover {
                 background: #ff1a66;
@@ -280,23 +284,22 @@ class TVBoxApp {
                 outline: 2px solid #fff;
                 outline-offset: 2px;
             }
-            .video-embed-container {
+            .video-player-container {
                 flex: 1;
                 display: flex;
                 align-items: center;
                 justify-content: center;
-                min-height: 400px;
+                background: #000;
+                position: relative;
             }
-            .video-embed-container iframe {
-                width: 100%;
-                max-width: 400px;
-                height: 600px;
-                border: none;
+            .video-player-container video {
+                max-width: 100%;
+                max-height: 70vh;
                 border-radius: 12px;
+                object-fit: contain;
             }
-            .video-embed-container .loading {
-                color: #fff;
-                font-size: 18px;
+            .video-player-container video::-webkit-media-controls {
+                background: rgba(0,0,0,0.5);
             }
             .video-info-modal {
                 padding: 20px 0;
@@ -318,54 +321,13 @@ class TVBoxApp {
                 font-size: 14px;
                 opacity: 0.7;
             }
-            .external-link-btn {
-                background: #ff0050;
-                color: #fff;
-                padding: 15px 30px;
-                border-radius: 8px;
-                text-decoration: none;
-                font-size: 18px;
-                font-weight: 600;
-                display: inline-block;
-                margin-top: 20px;
-                border: none;
-                cursor: pointer;
-            }
-            .external-link-btn:hover {
-                background: #ff1a66;
-            }
-            .external-link-btn:focus {
-                outline: 2px solid #fff;
-                outline-offset: 2px;
-            }
-            .thumbnail-container {
-                text-align: center;
-                position: relative;
-            }
-            .thumbnail-container img {
-                max-width: 100%;
-                max-height: 60vh;
-                border-radius: 12px;
-                object-fit: contain;
-            }
-            .play-overlay {
+            .video-loading {
                 position: absolute;
                 top: 50%;
                 left: 50%;
                 transform: translate(-50%, -50%);
-                width: 80px;
-                height: 80px;
-                background: rgba(255,0,80,0.8);
-                border-radius: 50%;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                cursor: pointer;
-            }
-            .play-overlay span {
-                font-size: 32px;
                 color: #fff;
-                margin-left: 5px;
+                font-size: 18px;
             }
         `;
         
@@ -373,29 +335,20 @@ class TVBoxApp {
         document.body.appendChild(modal);
         this.isModalOpen = true;
         
-        // Show thumbnail with play button immediately
-        const container = document.getElementById('embedContainer');
-        container.innerHTML = `
-            <div class="thumbnail-container">
-                <img src="${video.thumbnail}" alt="${video.desc}">
-                <div class="play-overlay" id="playOverlay">
-                    <span>▶</span>
-                </div>
-                <button class="external-link-btn" id="openTikTokBtn" onclick="window.location.href='${video.videoUrl}'">
-                    Xem trên TikTok
-                </button>
-            </div>
-        `;
-        
-        // Try to get oEmbed (may fail due to CORS, but that's ok)
-        try {
-            const embedData = await this.api.getVideoEmbed(video.videoUrl);
-            if (embedData && embedData.html) {
-                container.innerHTML = embedData.html;
-            }
-        } catch (error) {
-            console.log('oEmbed failed (expected due to CORS), using fallback');
-            // Keep the thumbnail fallback that's already shown
+        // Handle video element
+        const videoEl = document.getElementById('activeVideo');
+        if (videoEl) {
+            // Try to unmute after autoplay
+            videoEl.addEventListener('loadeddata', () => {
+                videoEl.muted = false;
+                videoEl.volume = 1;
+            });
+            
+            // Handle play error (autoplay policy)
+            videoEl.addEventListener('error', (e) => {
+                console.log('Video error, trying with controls');
+                videoEl.controls = true;
+            });
         }
         
         // Focus the close button for keyboard navigation
